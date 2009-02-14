@@ -9,13 +9,14 @@
 
 require 'json'
 
-module Translate
+module GAPI
   class UnsupportedLanguagePair < StandardError
   end
 
-  class RTranslate
+  class Language
     # Google AJAX Language REST Service URL
     GOOGLE_TRANSLATE_URL = "http://ajax.googleapis.com/ajax/services/language/translate"
+    GOOGLE_DETECT_URL = "http://ajax.googleapis.com/ajax/services/language/detect"
 
     # Default version of Google AJAX Language API
     DEFAULT_VERSION = "1.0"
@@ -25,22 +26,27 @@ module Translate
 
     class << self
       def translate(text, from, to)
-        RTranslate.new.translate(text, { :from => from, :to => to })
+        Language.new.translate(text, { :from => from, :to => to })
       end
 
       def translate_strings(text_array, from, to)
-        RTranslate.new.translate_strings(text_array, {:from => from, :to => to})
+        Language.new.translate_strings(text_array, {:from => from, :to => to})
       end
 
       def translate_string_to_languages(text, options)
-        RTranslate.new.translate_string_to_languages(text, options)
+        Language.new.translate_string_to_languages(text, options)
       end
 
       def batch_translate(translate_options)
-        RTranslate.new.batch_translate(translate_options)
+        Language.new.batch_translate(translate_options)
+      end
+      
+      def detect(text)
+        Language.new.detect(text)
       end
 
       alias_method :t, :translate
+      alias_method :d, :detect
     end
 
     def initialize(version = DEFAULT_VERSION, key = nil, default_from = nil, default_to = nil)
@@ -115,14 +121,65 @@ module Translate
         self.translate(text, option)
       end
     end
+    
+    # detect the language of a given string
+    def detect(text)
+      url = "#{GOOGLE_DETECT_URL}?q=#{text}&v=#{@version}"
+      if @key
+        url << "&key=#{@key}"
+      end
+      do_detection(url)
+    end
 
     private
+    
+    # sends language translation request to google and receive json response
+    #
+    # JSON response for translate language
+    # {
+    #   "responseData" : {
+    #     "translatedText" : the-translated-text,
+    #     "detectedSourceLanguage"? : the-source-language
+    #   },
+    #   "responseDetails" : null | string-on-error,
+    #   "responseStatus" : 200 | error-code
+    # }
     def do_translate(url) #:nodoc:
       begin
         jsondoc = open(URI.escape(url)).read
         response = JSON.parse(jsondoc)
         if response["responseStatus"] == 200
           response["responseData"]["translatedText"]
+        else
+          raise StandardError, response["responseDetails"]
+        end
+      rescue Exception => e
+        raise StandardError, e.message
+      end
+    end
+    
+    # sends json request to google and receive json response
+    #
+    # JSON response for language detection
+    # {
+    #   "responseData" : {
+    #     "language" : the-detected-language,
+    #     "isReliable" : the-reliability-of-the-detect,
+    #     "confidence" : the-confidence-level-of-the-detect
+    #   },
+    #   "responseDetails" : null | string-on-error,
+    #   "responseStatus" : 200 | error-code
+    # }
+    #
+    # returns hash with response {:language, :is_reliable, :confidence}
+    def do_detection(url) #:nodoc:
+      begin
+        jsondoc = open(URI.escape(url)).read
+        response = JSON.parse(jsondoc)
+        if response["responseStatus"] == 200
+          { language: response["responseData"]["language"], 
+            is_reliable: response["responseData"]["isReliable"], 
+            confidence: response["responseData"]["confidence"] }
         else
           raise StandardError, response["responseDetails"]
         end

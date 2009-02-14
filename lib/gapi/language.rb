@@ -81,6 +81,7 @@ module Google
       'ps' => 'PASHTO',
       'fa' => 'PERSIAN',
       'pl' => 'POLISH',
+      'pt' => 'PORTUGUESE',
       'pt-PT' => 'PORTUGUESE',
       'pa' => 'PUNJABI',
 

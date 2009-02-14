@@ -1,16 +1,25 @@
-== rtranslate
+== Google API (GAPI)
 
-A simple, unofficial, ruby client API for using Google Translate.
+A simple, unofficial, ruby client API for using Google API.
 
 == Usage
 
-require "rtranslate"
-result = Translate.t("Good Morning", "English", "CHINESE_SIMPLIFIED")
+Translation of an english text to simplified chinese:
+
+require "gapi"
+result = GAPI::Language.t("Good Morning", "English", "CHINESE_SIMPLIFIED")
 # => "早上好"
+
+Detect language of a text:
+
+require "gapi"
+result = GAPI::Language.d("おはようございます")
+# => {:language=>"ja", :is_reliable=>true, :confidence=>0.15255931}
 
 Check test for more examples
 
 == COPYRIGHT
 
+Copyright (c) 2009 Daniel Bovensiepen <daniel@bovensiepen.net>
 Copyright (c) 2007 Dingding Ye <yedingding@gmail.com>
 Distributed under MIT License
