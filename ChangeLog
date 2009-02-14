@@ -1,3 +1,7 @@
+v1.2 Feb 15th, 2009
+* rename to GAPI (Google API)
+* add language detection functionality
+
 v1.1 Feb 14th, 2009
 * forked by Daniel Bovensiepen
 * remove hpricot dependencies
