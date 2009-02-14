@@ -1,21 +1,11 @@
 = google-api-transalte-ruby
 A simple, unofficial, ruby client API for using Google Translate.
 
-== Install
-
-sudo gem install sishen-rtranslate
-
 == Usage
 1.
-{{{
 require "rtranslate"
-result = Translate.t("xxx", Language::English, Language::CHINESE_SIMPLIFIED)
-}}}
-
-2.
-{{{
-$rtranslate -f en -t zh-CN xxx
-}}}
+result = Translate.t("xxx", "English", "CHINESE_SIMPLIFIED")
+# => "早上好"
 
 Check test for more examples
 

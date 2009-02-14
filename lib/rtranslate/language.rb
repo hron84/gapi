@@ -1,3 +1,5 @@
+# this file was modified by Daniel Bovensiepen (daniel@bovensiepen.net)
+
 module Google
   module Language
     Languages = {
@@ -115,11 +117,7 @@ module Google
 
     # judge whether the language is supported by google translate
     def supported?(language)
-      if Languages.key?(language) || Languages.value?(language.upcase)
-        true
-      else
-        false
-      end
+      Languages.key?(language) || Languages.value?(language.upcase)
     end
     module_function :supported?
 

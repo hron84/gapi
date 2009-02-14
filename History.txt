@@ -1,3 +1,10 @@
+v1.1 Feb 14th, 2009
+* forked by Daniel Bovensiepen
+* remove hpricot dependencies
+* fix for Ruby 1.9 (maybe break 1.8)
+* drop gem and cli tool
+* scalling down rakefile
+
 v1.0 Dec 16th, 2008
 * using the Google AJAX Language API instead of scrape
 * add the batch translation support

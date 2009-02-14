@@ -4,13 +4,10 @@
 # Author::    Dingding Ye  (mailto:yedingding@gmail.com)
 # Copyright:: Copyright (c) 2007 Dingding Ye
 # License::   Distributes under MIT License
+#
+# this file was modified by Daniel Bovensiepen (daniel@bovensiepen.net)
 
-begin
-  require 'json'
-rescue LoadError
-  require 'rubygems'
-  require 'json'
-end
+require 'json'
 
 module Translate
   class UnsupportedLanguagePair < StandardError
