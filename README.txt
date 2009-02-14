@@ -4,7 +4,7 @@ A simple, unofficial, ruby client API for using Google Translate.
 == Usage
 1.
 require "rtranslate"
-result = Translate.t("xxx", "English", "CHINESE_SIMPLIFIED")
+result = Translate.t("Good Morning", "English", "CHINESE_SIMPLIFIED")
 # => "早上好"
 
 Check test for more examples
