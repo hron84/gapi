@@ -4,7 +4,7 @@ $:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib")
 require 'test/unit'
 require 'gapi'
 
-class GAPI::TranslateTest < Test::Unit::TestCase
+class GAPI::DetectTest < Test::Unit::TestCase
   include Google::Language
   def test_language_detection
     assert_equal("ARABIC", detect_it("مرحبا العالم"));

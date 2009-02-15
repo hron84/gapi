@@ -1,5 +1,5 @@
-# The program is a simple, unofficial, ruby client API
-# for using Google Translate.
+# this is an unofficial ruby client API 
+# for using the Google Translation API
 #
 # Author::    Dingding Ye  (mailto:yedingding@gmail.com)
 # Copyright:: Copyright (c) 2007 Dingding Ye
@@ -7,9 +7,10 @@
 #
 # this file was modified by Daniel Bovensiepen (daniel@bovensiepen.net)
 
-require 'json'
-
 module GAPI
+  # Default version of Google AJAX API
+  DEFAULT_VERSION = "1.0"
+  
   class UnsupportedLanguagePair < StandardError
   end
 
@@ -17,9 +18,6 @@ module GAPI
     # Google AJAX Language REST Service URL
     GOOGLE_TRANSLATE_URL = "http://ajax.googleapis.com/ajax/services/language/translate"
     GOOGLE_DETECT_URL = "http://ajax.googleapis.com/ajax/services/language/detect"
-
-    # Default version of Google AJAX Language API
-    DEFAULT_VERSION = "1.0"
 
     attr_reader :version, :key
     attr_reader :default_from, :default_to
@@ -49,7 +47,7 @@ module GAPI
       alias_method :d, :detect
     end
 
-    def initialize(version = DEFAULT_VERSION, key = nil, default_from = nil, default_to = nil)
+    def initialize(version = GAPI::DEFAULT_VERSION, key = nil, default_from = nil, default_to = nil)
       @version = version
       @key = key
       @default_from = default_from
