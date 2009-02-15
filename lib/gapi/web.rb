@@ -73,8 +73,8 @@ module GAPI
     #  , "responseDetails": null, "responseStatus": 200}
     #
     # returns array with results in a hash 
-    # {:GsearchResultClass, :unescapedUrl, :url, :visibleUrl, 
-    #  :cacheUrl, :title, :titleNoFormatting, :content}
+    # {"GsearchResultClass", "unescapedUrl", "url", "visibleUrl", 
+    #  "cacheUrl", "title", "titleNoFormatting", "content"}
     def do_search(url) #:nodoc:
       begin
         jsondoc = open(URI.escape(url)).read
