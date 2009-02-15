@@ -4,16 +4,26 @@ A simple, unofficial, ruby client API for using Google API.
 
 == Usage
 
+Searching for something in the web:
+
+require "gapi"
+
+GAPI::Web.s("Paris Hilton")[0]["url"]
+=> "http://en.wikipedia.org/wiki/Paris_Hilton"
+
+GAPI::Web.s("Paris Hilton")[0]["content"]
+=> "<b>Paris</b> Whitney <b>Hilton</b> (born February 17, 1981) is an American socialite, model, media personality, singer and occasional actress. <b>...</b>"
+
 Translation of an english text to simplified chinese:
 
 require "gapi"
-result = GAPI::Language.t("Good Morning", "English", "CHINESE_SIMPLIFIED")
+GAPI::Language.t("Good Morning", "English", "CHINESE_SIMPLIFIED")
 # => "早上好"
 
 Detect language of a text:
 
 require "gapi"
-result = GAPI::Language.d("おはようございます")
+GAPI::Language.d("おはようございます")
 # => {:language=>"ja", :is_reliable=>true, :confidence=>0.15255931}
 
 Check test for more examples
