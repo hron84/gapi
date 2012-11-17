@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-$:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib")
-
-require 'test/unit'
-require 'gapi'
+require 'test_helper'
 
 class GAPI::DetectTest < Test::Unit::TestCase
   include Google::Language
+
+  def setup
+    assert_not_nil ENV['GAPI_KEY'], "Google translate API no longer available without API key"
+  end
+
+
   def test_language_detection
     assert_equal("ARABIC", detect_it("مرحبا العالم"));
     assert_equal("CHINESE_SIMPLIFIED", detect_it("世界您好"));
@@ -18,9 +21,9 @@ class GAPI::DetectTest < Test::Unit::TestCase
     assert_equal("RUSSIAN", detect_it("Привет мир"));
     assert_equal("SPANISH", detect_it("Hola mundo"));
   end
-  
+
   private
-  
+
   def detect_it(text)
     Languages[GAPI::Language.d(text)[:language]]
   end
