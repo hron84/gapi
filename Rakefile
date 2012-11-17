@@ -9,10 +9,9 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
-if ENV['CI']
+if File.exists? File.expand_path('./.gapi-key', File.dirname(__FILE__))
   gapi = File.read File.expand_path('./.gapi-key', File.dirname(__FILE__))
   ENV['GAPI_KEY'] = gapi.strip
-  p ENV['GAPI_KEY']
 end
 
 require 'rake'
