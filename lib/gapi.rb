@@ -9,7 +9,7 @@
 
 require 'json'
 require 'uri'
-require 'open-uri'
+require 'net/https'
 require File.join(File.dirname(__FILE__), 'gapi/language')
 require File.join(File.dirname(__FILE__), 'gapi/web')
 

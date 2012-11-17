@@ -1,4 +1,4 @@
-# this is an unofficial ruby client API 
+# this is an unofficial ruby client API
 # for using the Google Search API
 #
 # Author::    Daniel Bovensiepen  (daniel@bovensiepen.net)
@@ -8,12 +8,12 @@
 module GAPI
   class Web
     GOOGLE_SEARCH_URL = "http://ajax.googleapis.com/ajax/services/search/web"
-    
+
     class << self
       def search(text)
         Web.new.search(text)
       end
-      
+
       alias_method :s, :search
     end
 
@@ -30,7 +30,7 @@ module GAPI
       end
       do_search(url)
     end
-    
+
     # sends json request to google and receive json response
     #
     # JSON response by search for "Paris Hilton"
@@ -72,12 +72,28 @@ module GAPI
     #  }
     #  , "responseDetails": null, "responseStatus": 200}
     #
-    # returns array with results in a hash 
-    # {"GsearchResultClass", "unescapedUrl", "url", "visibleUrl", 
+    # returns array with results in a hash
+    # {"GsearchResultClass", "unescapedUrl", "url", "visibleUrl",
     #  "cacheUrl", "title", "titleNoFormatting", "content"}
     def do_search(url) #:nodoc:
       begin
-        jsondoc = open(URI.escape(url)).read
+        uri = URI.parse(URI.escape(url))
+        jsondoc = ""
+
+        http = Net::HTTP.new(uri.host, uri.port)
+        if uri.scheme == 'https'
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+
+        http.start do |http|
+          rsp = http.get(uri.request_uri)
+          if rsp.code.to_i > 399
+            raise StandardError, rsp.message
+          end
+          jsondoc = rsp.body
+        end
+
         response = JSON.parse(jsondoc)
         if response["responseStatus"] == 200
           response["responseData"]["results"]
