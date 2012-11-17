@@ -1,22 +1,28 @@
-# this is an unofficial ruby client API 
+# This is an unofficial ruby client API 
 # for using the Google Search API
 #
 # Author::    Daniel Bovensiepen  (daniel@bovensiepen.net)
 # Copyright:: Copyright (c) 2009 Daniel Bovensiepen
 # License::   Distributes under MIT License
-#
-# this file was orignaly written by Dingding Ye (yedingding@gmail.com)
+
+# This file was orignaly written by Dingding Ye (yedingding@gmail.com)
 
 module GAPI
   class UnsupportedLanguagePair < StandardError
   end
-
+  
+  # This class is provides methods for Google Translate services
+  #
+  # It needs a Google API key. It should be provided both via parameter
+  # and via environment variable. The environment variable name is GAPI_KEY
+  #
+  # Note:: static methods are 
   class Language
     # Google AJAX Language REST Service URL
-    GOOGLE_TRANSLATE_URL = "http://ajax.googleapis.com/ajax/services/language/translate"
-    GOOGLE_DETECT_URL = "http://ajax.googleapis.com/ajax/services/language/detect"
+    GOOGLE_TRANSLATE_URL = "https://www.googleapis.com/language/translate/v2"
+    GOOGLE_DETECT_URL = "https://www.googleapis.com/language/translate/v2/detect"
 
-    attr_reader :version, :key
+    attr_reader :key
     attr_reader :default_from, :default_to
 
     class << self
@@ -44,9 +50,8 @@ module GAPI
       alias_method :d, :detect
     end
 
-    def initialize(version = GAPI::DEFAULT_VERSION, key = nil, default_from = nil, default_to = nil)
-      @version = version
-      @key = key
+    def initialize(key = nil, default_from = nil, default_to = nil)
+      @key = key || ENV['GAPI_KEY']
       @default_from = default_from
       @default_to = default_to
 
@@ -70,8 +75,8 @@ module GAPI
       if Google::Language.supported?(from) && Google::Language.supported?(to)
         from = Google::Language.abbrev(from)
         to = Google::Language.abbrev(to)
-        langpair = "#{from}|#{to}"
-        url = "#{GOOGLE_TRANSLATE_URL}?q=#{text}&langpair=#{langpair}&v=#{@version}"
+
+        url = "#{GOOGLE_TRANSLATE_URL}?q=#{text}&source=#{from}&target=#{to}"
         if @key
           url << "&key=#{@key}"
         end
@@ -119,7 +124,7 @@ module GAPI
     
     # detect the language of a given string
     def detect(text)
-      url = "#{GOOGLE_DETECT_URL}?q=#{text}&v=#{@version}"
+      url = "#{GOOGLE_DETECT_URL}?q=#{text}"
       if @key
         url << "&key=#{@key}"
       end
@@ -143,10 +148,10 @@ module GAPI
       begin
         jsondoc = open(URI.escape(url)).read
         response = JSON.parse(jsondoc)
-        if response["responseStatus"] == 200
-          response["responseData"]["translatedText"]
+        if response.key?('data')
+          response["data"]["translations"].first['translatedText']
         else
-          raise StandardError, response["responseDetails"]
+          raise StandardError, response['error']['errors'].collect { |e| "#{e['message']}: #{e['reason']}" }.join(", ")
         end
       rescue Exception => e
         raise StandardError, e.message
@@ -154,29 +159,30 @@ module GAPI
     end
     
     # sends json request to google and receive json response
-    #
-    # JSON response for language detection
-    # {
-    #   "responseData" : {
-    #     "language" : the-detected-language,
-    #     "isReliable" : the-reliability-of-the-detect,
-    #     "confidence" : the-confidence-level-of-the-detect
-    #   },
-    #   "responseDetails" : null | string-on-error,
-    #   "responseStatus" : 200 | error-code
-    # }
-    #
+    # "data": {
+    #      "detections": [
+    #       [
+    #        {
+    #         "language": the-detected-language,
+    #         "isReliable": the-reliability-of-the-detect,
+    #         "confidence": the-confidence-level-of-the-detect
+    #        }
+    #       ]
+    #      ]
+    #     }
+    #    }
     # returns hash with response {:language, :is_reliable, :confidence}
     def do_detection(url) #:nodoc:
       begin
         jsondoc = open(URI.escape(url)).read
         response = JSON.parse(jsondoc)
-        if response["responseStatus"] == 200
-          { language: response["responseData"]["language"], 
-            is_reliable: response["responseData"]["isReliable"], 
-            confidence: response["responseData"]["confidence"] }
+        if response.key?('data')
+          { language: response["data"]["detections"].flatten.first['language'], 
+            is_reliable: response["data"]["detections"].flatten.first['language']["isReliable"], 
+            confidence: response["data"]["detections"].flatten.first['language']["confidence"] }
         else
-          raise StandardError, response["responseDetails"]
+          p response
+          raise StandardError, response['error']['errors'].collect { |e| "#{e['message']}: #{e['reason']}" }.join(", ")
         end
       rescue Exception => e
         raise StandardError, e.message
