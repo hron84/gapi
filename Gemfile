@@ -10,6 +10,7 @@ group :development do
   gem "bundler"
   gem "jeweler", "~> 1.8.4"
   gem "test-unit"
+  gem 'jruby-openssl' if defined?(JRUBY_VERSION)
 end
 
 gemspec
