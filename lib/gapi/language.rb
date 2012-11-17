@@ -177,9 +177,9 @@ module GAPI
         jsondoc = open(URI.escape(url)).read
         response = JSON.parse(jsondoc)
         if response.key?('data')
-          { language: response["data"]["detections"].flatten.first['language'], 
-            is_reliable: response["data"]["detections"].flatten.first['language']["isReliable"], 
-            confidence: response["data"]["detections"].flatten.first['language']["confidence"] }
+          { :language    => response["data"]["detections"].flatten.first['language'], 
+            :is_reliable => response["data"]["detections"].flatten.first['language']["isReliable"], 
+            :confidence  => response["data"]["detections"].flatten.first['language']["confidence"] }
         else
           p response
           raise StandardError, response['error']['errors'].collect { |e| "#{e['message']}: #{e['reason']}" }.join(", ")
