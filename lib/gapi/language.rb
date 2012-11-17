@@ -1,4 +1,4 @@
-# This is an unofficial ruby client API 
+# This is an unofficial ruby client API
 # for using the Google Search API
 #
 # Author::    Daniel Bovensiepen  (daniel@bovensiepen.net)
@@ -10,13 +10,13 @@
 module GAPI
   class UnsupportedLanguagePair < StandardError
   end
-  
+
   # This class is provides methods for Google Translate services
   #
   # It needs a Google API key. It should be provided both via parameter
   # and via environment variable. The environment variable name is GAPI_KEY
   #
-  # Note:: static methods are 
+  # Note:: static methods are depending on GAPI_KEY environment variable
   class Language
     # Google AJAX Language REST Service URL
     GOOGLE_TRANSLATE_URL = "https://www.googleapis.com/language/translate/v2"
@@ -41,7 +41,7 @@ module GAPI
       def batch_translate(translate_options)
         Language.new.batch_translate(translate_options)
       end
-      
+
       def detect(text)
         Language.new.detect(text)
       end
@@ -121,7 +121,7 @@ module GAPI
         self.translate(text, option)
       end
     end
-    
+
     # detect the language of a given string
     def detect(text)
       url = "#{GOOGLE_DETECT_URL}?q=#{text}"
@@ -132,7 +132,7 @@ module GAPI
     end
 
     private
-    
+
     # sends language translation request to google and receive json response
     #
     # JSON response for translate language
@@ -146,7 +146,23 @@ module GAPI
     # }
     def do_translate(url) #:nodoc:
       begin
-        jsondoc = open(URI.escape(url)).read
+        uri = URI.parse(URI.escape(url))
+        jsondoc = ""
+
+        http = Net::HTTP.new(uri.host, uri.port)
+        if uri.scheme == 'https'
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+
+        http.start do |http|
+          rsp = http.get(uri.request_uri)
+          if rsp.code.to_i > 399
+            raise StandardError, rsp.message
+          end
+          jsondoc = rsp.body
+        end
+
         response = JSON.parse(jsondoc)
         if response.key?('data')
           response["data"]["translations"].first['translatedText']
@@ -157,7 +173,7 @@ module GAPI
         raise StandardError, e.message
       end
     end
-    
+
     # sends json request to google and receive json response
     # "data": {
     #      "detections": [
@@ -174,11 +190,27 @@ module GAPI
     # returns hash with response {:language, :is_reliable, :confidence}
     def do_detection(url) #:nodoc:
       begin
-        jsondoc = open(URI.escape(url)).read
+        uri = URI.parse(URI.escape(url))
+        jsondoc = ""
+
+        http = Net::HTTP.new(uri.host, uri.port)
+        if uri.scheme == 'https'
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+
+        http.start do |http|
+          rsp = http.get(uri.request_uri)
+          if rsp.code.to_i > 399
+            raise StandardError, rsp.message
+          end
+          jsondoc = rsp.body
+        end
+
         response = JSON.parse(jsondoc)
         if response.key?('data')
-          { :language    => response["data"]["detections"].flatten.first['language'], 
-            :is_reliable => response["data"]["detections"].flatten.first['language']["isReliable"], 
+          { :language    => response["data"]["detections"].flatten.first['language'],
+            :is_reliable => response["data"]["detections"].flatten.first['language']["isReliable"],
             :confidence  => response["data"]["detections"].flatten.first['language']["confidence"] }
         else
           p response
